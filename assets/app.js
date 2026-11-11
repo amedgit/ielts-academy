@@ -197,7 +197,7 @@ function ttsHTML(id, lines){
       <button class="btn sm" data-tts-act="play" ${rateOK?'':'disabled'}>▶ Escuchar</button>
       <button class="btn ghost sm" data-tts-act="pause" ${rateOK?'':'disabled'}>⏸ Pausa</button>
       <button class="btn ghost sm" data-tts-act="stop" ${rateOK?'':'disabled'}>⏹ Parar</button>
-      ${hasAudio?'<span class="badge green" title="Audio pregrabado: no depende de las voces del sistema">🔊 voz pregrabada</span>':''}
+      ${hasAudio?'<span class="badge green" title="Audio pregrabado con voz americana: no depende de las voces del sistema">🔊 voz americana</span>':''}
       <span class="spacer"></span>
       <label class="tts-rate">Velocidad
         <input type="range" class="rate" min="0.6" max="1.2" step="0.05" value="0.92">
@@ -235,6 +235,11 @@ function playAudioLines(lines, box, rate){
   advanceAudio(player.token);
 }
 
+function audioSrc(url){
+  /* file:// no admite query strings: quitamos el ?v=... */
+  return location.protocol === 'file:' ? url.split('?')[0] : url;
+}
+
 function advanceAudio(token){
   if(token !== player.token) return;
   const p = player;
@@ -259,7 +264,7 @@ function advanceAudio(token){
     }
   }
 
-  const a = new Audio(urls[p.ci]);
+  const a = new Audio(audioSrc(urls[p.ci]));
   a.playbackRate = p.rate;
   p.audio = a;
   a.onended = () => { if(token !== player.token) return; p.ci++; advanceAudio(token); };

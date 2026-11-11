@@ -1,359 +1,303 @@
-/* Generado automáticamente: audios pregrabados (Google TTS, uso educativo personal) */
+/* Generado automáticamente: audios pregrabados con voces neuronales en-US */
 const AUDIO_TASKS = {
  "l1": [
   [
-   "assets/audio/l1/0-0.mp3"
+   "assets/audio/l1/0.mp3?v=us"
   ],
   [
-   "assets/audio/l1/1-0.mp3"
+   "assets/audio/l1/1.mp3?v=us"
   ],
   [
-   "assets/audio/l1/2-0.mp3"
+   "assets/audio/l1/2.mp3?v=us"
   ],
   [
-   "assets/audio/l1/3-0.mp3"
+   "assets/audio/l1/3.mp3?v=us"
   ],
   [
-   "assets/audio/l1/4-0.mp3"
+   "assets/audio/l1/4.mp3?v=us"
   ],
   [
-   "assets/audio/l1/5-0.mp3"
+   "assets/audio/l1/5.mp3?v=us"
   ],
   [
-   "assets/audio/l1/6-0.mp3"
+   "assets/audio/l1/6.mp3?v=us"
   ],
   [
-   "assets/audio/l1/7-0.mp3"
+   "assets/audio/l1/7.mp3?v=us"
   ],
   [
-   "assets/audio/l1/8-0.mp3"
+   "assets/audio/l1/8.mp3?v=us"
   ],
   [
-   "assets/audio/l1/9-0.mp3"
+   "assets/audio/l1/9.mp3?v=us"
   ],
   [
-   "assets/audio/l1/10-0.mp3"
+   "assets/audio/l1/10.mp3?v=us"
   ],
   [
-   "assets/audio/l1/11-0.mp3"
+   "assets/audio/l1/11.mp3?v=us"
   ],
   [
-   "assets/audio/l1/12-0.mp3"
+   "assets/audio/l1/12.mp3?v=us"
   ],
   [
-   "assets/audio/l1/13-0.mp3"
+   "assets/audio/l1/13.mp3?v=us"
   ],
   [
-   "assets/audio/l1/14-0.mp3"
+   "assets/audio/l1/14.mp3?v=us"
   ],
   [
-   "assets/audio/l1/15-0.mp3"
+   "assets/audio/l1/15.mp3?v=us"
   ],
   [
-   "assets/audio/l1/16-0.mp3"
+   "assets/audio/l1/16.mp3?v=us"
   ]
  ],
  "l2": [
   [
-   "assets/audio/l2/0-0.mp3",
-   "assets/audio/l2/0-1.mp3"
+   "assets/audio/l2/0.mp3?v=us"
   ],
   [
-   "assets/audio/l2/1-0.mp3",
-   "assets/audio/l2/1-1.mp3"
+   "assets/audio/l2/1.mp3?v=us"
   ],
   [
-   "assets/audio/l2/2-0.mp3"
+   "assets/audio/l2/2.mp3?v=us"
   ],
   [
-   "assets/audio/l2/3-0.mp3",
-   "assets/audio/l2/3-1.mp3"
+   "assets/audio/l2/3.mp3?v=us"
   ],
   [
-   "assets/audio/l2/4-0.mp3"
+   "assets/audio/l2/4.mp3?v=us"
   ]
  ],
  "l3": [
   [
-   "assets/audio/l3/0-0.mp3",
-   "assets/audio/l3/0-1.mp3"
+   "assets/audio/l3/0.mp3?v=us"
   ],
   [
-   "assets/audio/l3/1-0.mp3",
-   "assets/audio/l3/1-1.mp3"
+   "assets/audio/l3/1.mp3?v=us"
   ],
   [
-   "assets/audio/l3/2-0.mp3",
-   "assets/audio/l3/2-1.mp3"
+   "assets/audio/l3/2.mp3?v=us"
   ],
   [
-   "assets/audio/l3/3-0.mp3",
-   "assets/audio/l3/3-1.mp3"
+   "assets/audio/l3/3.mp3?v=us"
   ],
   [
-   "assets/audio/l3/4-0.mp3",
-   "assets/audio/l3/4-1.mp3"
+   "assets/audio/l3/4.mp3?v=us"
   ]
  ]
 };
 
 const AUDIO_MAP = {
  "w1model": [
-  "assets/audio/speak/w1model-0.mp3",
-  "assets/audio/speak/w1model-1.mp3",
-  "assets/audio/speak/w1model-2.mp3",
-  "assets/audio/speak/w1model-3.mp3",
-  "assets/audio/speak/w1model-4.mp3",
-  "assets/audio/speak/w1model-5.mp3",
-  "assets/audio/speak/w1model-6.mp3"
+  "assets/audio/speak/w1model.mp3?v=us"
  ],
  "w2model": [
-  "assets/audio/speak/w2model-0.mp3",
-  "assets/audio/speak/w2model-1.mp3",
-  "assets/audio/speak/w2model-2.mp3",
-  "assets/audio/speak/w2model-3.mp3",
-  "assets/audio/speak/w2model-4.mp3",
-  "assets/audio/speak/w2model-5.mp3",
-  "assets/audio/speak/w2model-6.mp3",
-  "assets/audio/speak/w2model-7.mp3",
-  "assets/audio/speak/w2model-8.mp3",
-  "assets/audio/speak/w2model-9.mp3",
-  "assets/audio/speak/w2model-10.mp3"
+  "assets/audio/speak/w2model.mp3?v=us"
  ],
  "sp0": [
-  "assets/audio/speak/sp0-0.mp3",
-  "assets/audio/speak/sp0-1.mp3",
-  "assets/audio/speak/sp0-2.mp3",
-  "assets/audio/speak/sp0-3.mp3",
-  "assets/audio/speak/sp0-4.mp3",
-  "assets/audio/speak/sp0-5.mp3"
+  "assets/audio/speak/sp0.mp3?v=us"
  ],
  "sp1": [
-  "assets/audio/speak/sp1-0.mp3",
-  "assets/audio/speak/sp1-1.mp3",
-  "assets/audio/speak/sp1-2.mp3",
-  "assets/audio/speak/sp1-3.mp3",
-  "assets/audio/speak/sp1-4.mp3",
-  "assets/audio/speak/sp1-5.mp3",
-  "assets/audio/speak/sp1-6.mp3"
+  "assets/audio/speak/sp1.mp3?v=us"
  ],
  "sp2": [
-  "assets/audio/speak/sp2-0.mp3",
-  "assets/audio/speak/sp2-1.mp3",
-  "assets/audio/speak/sp2-2.mp3",
-  "assets/audio/speak/sp2-3.mp3",
-  "assets/audio/speak/sp2-4.mp3",
-  "assets/audio/speak/sp2-5.mp3"
+  "assets/audio/speak/sp2.mp3?v=us"
  ],
  "sp3": [
-  "assets/audio/speak/sp3-0.mp3",
-  "assets/audio/speak/sp3-1.mp3",
-  "assets/audio/speak/sp3-2.mp3",
-  "assets/audio/speak/sp3-3.mp3",
-  "assets/audio/speak/sp3-4.mp3",
-  "assets/audio/speak/sp3-5.mp3"
+  "assets/audio/speak/sp3.mp3?v=us"
  ],
  "p3-0": [
-  "assets/audio/speak/p3-0-0.mp3",
-  "assets/audio/speak/p3-0-1.mp3",
-  "assets/audio/speak/p3-0-2.mp3",
-  "assets/audio/speak/p3-0-3.mp3"
+  "assets/audio/speak/p3-0.mp3?v=us"
  ],
  "p3-1": [
-  "assets/audio/speak/p3-1-0.mp3",
-  "assets/audio/speak/p3-1-1.mp3",
-  "assets/audio/speak/p3-1-2.mp3",
-  "assets/audio/speak/p3-1-3.mp3"
+  "assets/audio/speak/p3-1.mp3?v=us"
  ],
  "p3-2": [
-  "assets/audio/speak/p3-2-0.mp3",
-  "assets/audio/speak/p3-2-1.mp3",
-  "assets/audio/speak/p3-2-2.mp3",
-  "assets/audio/speak/p3-2-3.mp3"
+  "assets/audio/speak/p3-2.mp3?v=us"
  ],
  "p3-3": [
-  "assets/audio/speak/p3-3-0.mp3",
-  "assets/audio/speak/p3-3-1.mp3",
-  "assets/audio/speak/p3-3-2.mp3"
+  "assets/audio/speak/p3-3.mp3?v=us"
  ],
  "card-significant": [
-  "assets/audio/words/significant.mp3"
+  "assets/audio/words/significant.mp3?v=us"
  ],
  "card-beneficial": [
-  "assets/audio/words/beneficial.mp3"
+  "assets/audio/words/beneficial.mp3?v=us"
  ],
  "card-detrimental": [
-  "assets/audio/words/detrimental.mp3"
+  "assets/audio/words/detrimental.mp3?v=us"
  ],
  "card-substantial": [
-  "assets/audio/words/substantial.mp3"
+  "assets/audio/words/substantial.mp3?v=us"
  ],
  "card-crucial": [
-  "assets/audio/words/crucial.mp3"
+  "assets/audio/words/crucial.mp3?v=us"
  ],
  "card-inevitable": [
-  "assets/audio/words/inevitable.mp3"
+  "assets/audio/words/inevitable.mp3?v=us"
  ],
  "card-adequate": [
-  "assets/audio/words/adequate.mp3"
+  "assets/audio/words/adequate.mp3?v=us"
  ],
  "card-apparent": [
-  "assets/audio/words/apparent.mp3"
+  "assets/audio/words/apparent.mp3?v=us"
  ],
  "card-biased": [
-  "assets/audio/words/biased.mp3"
+  "assets/audio/words/biased.mp3?v=us"
  ],
  "card-comprehensive": [
-  "assets/audio/words/comprehensive.mp3"
+  "assets/audio/words/comprehensive.mp3?v=us"
  ],
  "card-controversial": [
-  "assets/audio/words/controversial.mp3"
+  "assets/audio/words/controversial.mp3?v=us"
  ],
  "card-deteriorate": [
-  "assets/audio/words/deteriorate.mp3"
+  "assets/audio/words/deteriorate.mp3?v=us"
  ],
  "card-diminish": [
-  "assets/audio/words/diminish.mp3"
+  "assets/audio/words/diminish.mp3?v=us"
  ],
  "card-enhance": [
-  "assets/audio/words/enhance.mp3"
+  "assets/audio/words/enhance.mp3?v=us"
  ],
  "card-feasible": [
-  "assets/audio/words/feasible.mp3"
+  "assets/audio/words/feasible.mp3?v=us"
  ],
  "card-fluctuate": [
-  "assets/audio/words/fluctuate.mp3"
+  "assets/audio/words/fluctuate.mp3?v=us"
  ],
  "card-fundamental": [
-  "assets/audio/words/fundamental.mp3"
+  "assets/audio/words/fundamental.mp3?v=us"
  ],
  "card-implement": [
-  "assets/audio/words/implement.mp3"
+  "assets/audio/words/implement.mp3?v=us"
  ],
  "card-incentive": [
-  "assets/audio/words/incentive.mp3"
+  "assets/audio/words/incentive.mp3?v=us"
  ],
  "card-infrastructure": [
-  "assets/audio/words/infrastructure.mp3"
+  "assets/audio/words/infrastructure.mp3?v=us"
  ],
  "card-mitigate": [
-  "assets/audio/words/mitigate.mp3"
+  "assets/audio/words/mitigate.mp3?v=us"
  ],
  "card-negligible": [
-  "assets/audio/words/negligible.mp3"
+  "assets/audio/words/negligible.mp3?v=us"
  ],
  "card-notion": [
-  "assets/audio/words/notion.mp3"
+  "assets/audio/words/notion.mp3?v=us"
  ],
  "card-obstacle": [
-  "assets/audio/words/obstacle.mp3"
+  "assets/audio/words/obstacle.mp3?v=us"
  ],
  "card-phenomenon": [
-  "assets/audio/words/phenomenon.mp3"
+  "assets/audio/words/phenomenon.mp3?v=us"
  ],
  "card-prevalent": [
-  "assets/audio/words/prevalent.mp3"
+  "assets/audio/words/prevalent.mp3?v=us"
  ],
  "card-prohibit": [
-  "assets/audio/words/prohibit.mp3"
+  "assets/audio/words/prohibit.mp3?v=us"
  ],
  "card-reinforce": [
-  "assets/audio/words/reinforce.mp3"
+  "assets/audio/words/reinforce.mp3?v=us"
  ],
  "card-reluctant": [
-  "assets/audio/words/reluctant.mp3"
+  "assets/audio/words/reluctant.mp3?v=us"
  ],
  "card-resilient": [
-  "assets/audio/words/resilient.mp3"
+  "assets/audio/words/resilient.mp3?v=us"
  ],
  "card-sustainable": [
-  "assets/audio/words/sustainable.mp3"
+  "assets/audio/words/sustainable.mp3?v=us"
  ],
  "card-tackle": [
-  "assets/audio/words/tackle.mp3"
+  "assets/audio/words/tackle.mp3?v=us"
  ],
  "card-undermine": [
-  "assets/audio/words/undermine.mp3"
+  "assets/audio/words/undermine.mp3?v=us"
  ],
  "card-viable": [
-  "assets/audio/words/viable.mp3"
+  "assets/audio/words/viable.mp3?v=us"
  ],
  "card-widespread": [
-  "assets/audio/words/widespread.mp3"
+  "assets/audio/words/widespread.mp3?v=us"
  ],
  "card-allocate": [
-  "assets/audio/words/allocate.mp3"
+  "assets/audio/words/allocate.mp3?v=us"
  ],
  "card-advocate": [
-  "assets/audio/words/advocate.mp3"
+  "assets/audio/words/advocate.mp3?v=us"
  ],
  "card-alleviate": [
-  "assets/audio/words/alleviate.mp3"
+  "assets/audio/words/alleviate.mp3?v=us"
  ],
  "card-attribute": [
-  "assets/audio/words/attribute.mp3"
+  "assets/audio/words/attribute.mp3?v=us"
  ],
  "card-ambiguous": [
-  "assets/audio/words/ambiguous.mp3"
+  "assets/audio/words/ambiguous.mp3?v=us"
  ],
  "card-compel": [
-  "assets/audio/words/compel.mp3"
+  "assets/audio/words/compel.mp3?v=us"
  ],
  "card-constrain": [
-  "assets/audio/words/constrain.mp3"
+  "assets/audio/words/constrain.mp3?v=us"
  ],
  "card-correlate": [
-  "assets/audio/words/correlate.mp3"
+  "assets/audio/words/correlate.mp3?v=us"
  ],
  "card-criterion": [
-  "assets/audio/words/criterion.mp3"
+  "assets/audio/words/criterion.mp3?v=us"
  ],
  "card-disparity": [
-  "assets/audio/words/disparity.mp3"
+  "assets/audio/words/disparity.mp3?v=us"
  ],
  "card-empirical": [
-  "assets/audio/words/empirical.mp3"
+  "assets/audio/words/empirical.mp3?v=us"
  ],
  "card-exploit": [
-  "assets/audio/words/exploit.mp3"
+  "assets/audio/words/exploit.mp3?v=us"
  ],
  "card-facilitate": [
-  "assets/audio/words/facilitate.mp3"
+  "assets/audio/words/facilitate.mp3?v=us"
  ],
  "card-hinder": [
-  "assets/audio/words/hinder.mp3"
+  "assets/audio/words/hinder.mp3?v=us"
  ],
  "card-imply": [
-  "assets/audio/words/imply.mp3"
+  "assets/audio/words/imply.mp3?v=us"
  ],
  "card-incur": [
-  "assets/audio/words/incur.mp3"
+  "assets/audio/words/incur.mp3?v=us"
  ],
  "card-intrinsic": [
-  "assets/audio/words/intrinsic.mp3"
+  "assets/audio/words/intrinsic.mp3?v=us"
  ],
  "card-justify": [
-  "assets/audio/words/justify.mp3"
+  "assets/audio/words/justify.mp3?v=us"
  ],
  "card-legitimate": [
-  "assets/audio/words/legitimate.mp3"
+  "assets/audio/words/legitimate.mp3?v=us"
  ],
  "card-magnitude": [
-  "assets/audio/words/magnitude.mp3"
+  "assets/audio/words/magnitude.mp3?v=us"
  ],
  "card-nevertheless": [
-  "assets/audio/words/nevertheless.mp3"
+  "assets/audio/words/nevertheless.mp3?v=us"
  ],
  "card-offset": [
-  "assets/audio/words/offset.mp3"
+  "assets/audio/words/offset.mp3?v=us"
  ],
  "card-perceive": [
-  "assets/audio/words/perceive.mp3"
+  "assets/audio/words/perceive.mp3?v=us"
  ],
  "card-plausible": [
-  "assets/audio/words/plausible.mp3"
+  "assets/audio/words/plausible.mp3?v=us"
  ],
  "card-profound": [
-  "assets/audio/words/profound.mp3"
+  "assets/audio/words/profound.mp3?v=us"
  ]
 };
