@@ -7,7 +7,7 @@
 const KEY = 'ielts-academy-v1';
 const DEFAULT_STATE = {
   done: {}, srs: {}, quiz: {}, exams: [], draft: '',
-  streak: { last: null, count: 0 }, theme: 'light'
+  streak: { last: null, count: 0 }, theme: 'sepia'
 };
 let S = loadState();
 
@@ -100,13 +100,19 @@ function doneBtn(id, label){
 }
 
 /* ------------------------- tema ------------------------- */
+const THEMES = ['sepia', 'light', 'dark'];
+const THEME_COLORS = { sepia:'#f3ead6', light:'#f4f7fa', dark:'#080c12' };
+
 function applyTheme(t){
-  const dark = t === 'dark';
-  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  const icon = $('#themeIcon'); if(icon) icon.textContent = dark ? '☀️' : '🌙';
-  const label = $('.theme-label'); if(label) label.textContent = dark ? 'Claro' : 'Oscuro';
+  if(!THEMES.includes(t)) t = 'sepia';
+  document.documentElement.setAttribute('data-theme', t);
+  $$('[data-theme-set]').forEach(b => {
+    const on = b.dataset.themeSet === t;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
   const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute('content', dark ? '#080c12' : '#f4f7fa');
+  if(meta) meta.setAttribute('content', THEME_COLORS[t]);
 }
 
 /* ------------------------- barra superior ------------------------- */
@@ -1646,11 +1652,12 @@ $('#scrim').addEventListener('click', ()=>{
 });
 
 /* cambiar de tema */
-$('#themeBtn').addEventListener('click', () => {
-  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  S.theme = next;
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-theme-set]');
+  if(!b) return;
+  S.theme = b.dataset.themeSet;
   save();
-  applyTheme(next);
+  applyTheme(S.theme);
 });
 
 /* repaso rápido desde la barra superior */
@@ -1674,7 +1681,7 @@ document.addEventListener('input', e => {
 });
 
 /* arranque */
-applyTheme(S.theme === 'dark' ? 'dark' : 'light');
+applyTheme(S.theme);
 window.addEventListener('hashchange', route);
 if(!location.hash) location.hash = 'inicio';
 route();

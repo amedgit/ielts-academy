@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>IELTS Academy · Curso de cero a C1 + IELTS 7.0</title>
-<meta name="theme-color" content="#f4f7fa">
+<meta name="theme-color" content="#f3ead6">
 <meta name="description" content="Academia personal de inglés: curso completo A0→C1 en 24 unidades + preparación IELTS banda 7.0, con audios, vocabulario y simulacros.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2334d399'/%3E%3Ctext x='32' y='43' font-family='Arial' font-size='26' font-weight='bold' text-anchor='middle' fill='%2304140f'%3E7.0%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,8 +14,9 @@
   (function(){
     try{
       var s = JSON.parse(localStorage.getItem('ielts-academy-v1') || '{}');
-      document.documentElement.setAttribute('data-theme', s.theme === 'dark' ? 'dark' : 'light');
-    }catch(e){ document.documentElement.setAttribute('data-theme','light'); }
+      var t = s.theme === 'light' || s.theme === 'dark' ? s.theme : 'sepia';
+      document.documentElement.setAttribute('data-theme', t);
+    }catch(e){ document.documentElement.setAttribute('data-theme','sepia'); }
   })();
 </script>
 <link rel="stylesheet" href="assets/styles.css">
@@ -67,7 +68,11 @@
     <div class="crumb" id="crumb">Inicio</div>
     <div class="top-stats">
       <span class="pill" title="Palabras dominadas">📚 <b id="vocabTop">0</b>/60</span>
-      <button class="pill pill-btn theme-btn" id="themeBtn" title="Cambiar entre tema claro y oscuro"><span id="themeIcon">🌙</span><span class="theme-label">Oscuro</span></button>
+      <div class="theme-switch" role="group" aria-label="Tema de color">
+        <button data-theme-set="sepia" title="Tema sepia" aria-label="Tema sepia" aria-pressed="false">📜</button>
+        <button data-theme-set="light" title="Tema claro" aria-label="Tema claro" aria-pressed="false">☀️</button>
+        <button data-theme-set="dark" title="Tema oscuro" aria-label="Tema oscuro" aria-pressed="false">🌙</button>
+      </div>
       <button class="pill pill-btn" id="quickStudy" title="Sesión rápida de vocabulario">⚡ Repaso</button>
     </div>
   </header>
