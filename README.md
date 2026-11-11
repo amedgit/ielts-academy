@@ -19,6 +19,7 @@ Y entra en <http://localhost:8080>.
 
 | Sección | Contenido |
 |---|---|
+| **Curso 0→C1** | 6 niveles (A0, A1, A2, B1, B2, C1) × 4 unidades: teoría, 144 palabras con audio, ejemplos locutados y 120 preguntas de test |
 | **Inicio** | Resumen, racha, estadísticas y expectativas realistas A2 → 7.0 |
 | **Ruta de estudio** | Plan de 48 semanas en 4 fases, semana tipo y tabla banda ↔ nivel MCER |
 | **Listening** | 3 tareas tipo examen (formulario, multiple choice, notas) con voz sintética y guion |
@@ -42,7 +43,7 @@ Regla: **30 minutos diarios > 6 horas el domingo**. La racha cuenta los días en
 ## Detalles técnicos
 
 - HTML + CSS + JavaScript puro. Sin build, sin dependencias.
-- **Audios pregrabados** en `assets/audio/`: 27 líneas de listening, 10 modelos y 60 palabras. Voces **neuronales americanas (en-US)**: Aria (femenina) y Guy (masculina) en los diálogos. Suenan siempre, sin depender de las voces del sistema, y la velocidad se ajusta con el control.
+- **Audios pregrabados** en `assets/audio/`: 27 líneas de listening, 10 modelos, 60 palabras, y 159 audios del curso (24 unidades + 135 palabras). Voces **neuronales americanas (en-US)**: Aria (femenina) y Guy (masculina) en los diálogos. Suenan siempre, sin depender de las voces del sistema, y la velocidad se ajusta con el control.
   - Los MP3 se generaron con la voz de Google Translate (uso personal/educativo) y se sirven en local: no hay llamadas a Internet al reproducir.
 - Fuentes de Google Fonts con fallback a fuentes del sistema (funciona sin internet).
 - Progreso exportable desde **Mi progreso → Exportar progreso**.
@@ -63,4 +64,4 @@ Luego en GitHub: **Settings → Pages → Branch: main → /(root)**. En un par 
 
 ## Aviso honesto
 
-Una banda 7.0 equivale a nivel C1. Desde A2 son **700–900 horas** de estudio real. Esta web te da la estructura y el material; las horas y la constancia las pones tú. El simulacro da una banda **orientativa** de gramática y vocabulario, no sustituye a un examen oficial.
+Una banda 7.0 equivale a nivel C1. Desde cero son **1.200–1.500 horas**; desde A2, **700–900 horas** de estudio real. Esta web te da la estructura y el material; las horas y la constancia las pones tú. El simulacro da una banda **orientativa** de gramática y vocabulario, no sustituye a un examen oficial.

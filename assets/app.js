@@ -85,6 +85,15 @@ const GROUPS = {
   'Speaking': ['s1','s2','s3']
 };
 
+/* Curso A0 → C1: se añade a las lecciones y al dashboard */
+COURSE.levels.forEach(l => {
+  l.units.forEach(u => LESSONS.push([u.id, 'Curso ' + l.cefr + ' · ' + u.title]));
+});
+GROUPS['Curso A0→C1'] = COURSE.levels.flatMap(l => l.units.map(u => u.id));
+
+const slugify = s => String(s).toLowerCase().normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
 function doneBtn(id, label){
   const d = !!S.done[id];
   return `<button class="btn ghost sm done-btn ${d?'done':''}" data-done="${id}">${d?'✓ Completado':(label||'Marcar como completado')}</button>`;
@@ -346,11 +355,20 @@ function speakText(text){
 /* Reproduce un modelo o una palabra: primero el MP3 pregrabado,
    y si no existe, la voz del sistema. */
 function speakKey(id){
-  if(typeof AUDIO_MAP !== 'undefined' && AUDIO_MAP[id]){
-    playAudioLines([AUDIO_MAP[id]], null, 1);
+  const map = (typeof AUDIO_MAP !== 'undefined' && AUDIO_MAP[id])
+    || (typeof AUDIO_COURSE !== 'undefined' && AUDIO_COURSE[id]);
+  if(map){
+    playAudioLines([map], null, 1);
     return;
   }
   speakText(SPEAK_REG[id] || '');
+}
+
+/* botón compacto con audio para una palabra del curso */
+function wordBtn(word){
+  const key = 'w-' + slugify(word);
+  SPEAK_REG[key] = word;
+  return `<button class="btn ghost sm" data-speak="${key}" title="Escuchar ${esc(word)}" style="padding:3px 8px;font-size:.72rem">🔊</button>`;
 }
 function speakBtn(id, text, label='Escuchar modelo'){
   SPEAK_REG[id] = text;
@@ -420,7 +438,7 @@ function timerControl(btn){
 }
 
 /* ------------------------- navegación ------------------------- */
-const VIEWS = ['inicio','plan','listening','reading','writing','speaking','vocab','gramatica','examen','progreso'];
+const VIEWS = ['inicio','curso','plan','listening','reading','writing','speaking','vocab','gramatica','examen','progreso'];
 const RENDER = {};
 
 function go(view){
@@ -454,21 +472,43 @@ RENDER.inicio = () => {
 
   $('#inicio').innerHTML = `
   <div class="hero">
-    <span class="badge green">Plan personal · objetivo banda 7.0</span>
-    <h1>De A2 a banda 7.0,<br>sin atajos y sin perderte.</h1>
-    <p>Una academia completa en tu navegador: ruta de 48 semanas, gramática de A2 a C1, 60 palabras académicas con repaso espaciado, listening con voz, reading con preguntas explicadas, writing con modelos banda 7 y speaking con cronómetro.</p>
+    <span class="badge green">Curso A0 → C1 + preparación IELTS 7.0</span>
+    <h1>De cero a héroe en inglés,<br>y después a banda 7.0.</h1>
+    <p>Un curso completo de 24 unidades que empieza en el alfabeto y termina en nivel C1, más la preparación específica del IELTS: ruta de 48 semanas, listening con voz, reading explicado, writing con modelos y speaking con cronómetro.</p>
     <div class="hero-actions">
-      <button class="btn" data-nav="plan">Empezar la ruta →</button>
-      <button class="btn ghost" data-nav="examen">Hacer el mini-simulacro</button>
-      <button class="btn ghost" data-nav="vocab">Repasar 10 palabras</button>
+      <button class="btn" data-nav="curso">Empezar desde cero →</button>
+      <button class="btn ghost" data-nav="plan">Ruta IELTS (48 semanas)</button>
+      <button class="btn ghost" data-nav="examen">Mini-simulacro</button>
     </div>
   </div>
 
   <div class="grid four" style="margin-bottom:18px">
     <div class="stat"><div class="n">${st}</div><div class="l">días de racha</div></div>
     <div class="stat"><div class="n">${mastered}<small>/60</small></div><div class="l">palabras dominadas</div></div>
-    <div class="stat"><div class="n">${doneCount}<small>/18</small></div><div class="l">lecciones hechas</div></div>
+    <div class="stat"><div class="n">${doneCount}<small>/${LESSONS.length}</small></div><div class="l">lecciones hechas</div></div>
     <div class="stat"><div class="n">${bestExam!==null?bestExam+'%':'—'}</div><div class="l">mejor simulacro</div></div>
+  </div>
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <span class="badge green">Curso completo</span>
+        <h2 style="margin:10px 0 4px">De cero a héroe · A0 → C1</h2>
+        <p class="small muted" style="margin:0">24 unidades · 120 preguntas de test · 144 palabras con audio · ejemplos locutados</p>
+      </div>
+      <button class="btn sm" data-nav="curso">Entrar al curso →</button>
+    </div>
+    <div class="grid three" style="margin-top:16px">
+      ${COURSE.levels.map(l=>{
+        const d = l.units.filter(u=>S.done[u.id]).length;
+        return `<div class="stat" style="padding:11px 13px">
+          <div class="flex-between" style="margin-bottom:6px"><span class="badge">${l.cefr}</span><span class="small muted">${d}/4</span></div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:7px">${l.name}</div>
+          <div class="bar"><i style="width:${Math.round(d/4*100)}%"></i></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="note" style="margin-bottom:0">Si empiezas de cero, haz una unidad al día y repite el test hasta acertar 4/5. En 6 semanas tendrás una base A2 sólida.</div>
   </div>
 
   <div class="card">
@@ -479,8 +519,9 @@ RENDER.inicio = () => {
       <div>
         <h3>Qué vas a encontrar</h3>
         <ul class="clean">
-          <li><b>Ruta de 48 semanas</b> en 4 fases con objetivos medibles.</li>
-          <li><b>Listening real</b> leído por la voz del navegador, con guion.</li>
+          <li><b>Curso de cero a C1</b> en 6 niveles y 24 unidades con audio.</li>
+          <li><b>Ruta IELTS de 48 semanas</b> en 4 fases con objetivos medibles.</li>
+          <li><b>Listening real</b> con voz americana y guion.</li>
           <li><b>Reading</b> con preguntas True/False/Not Given explicadas.</li>
           <li><b>Writing</b> con estructura, lenguaje y modelos banda 7+.</li>
           <li><b>Speaking</b> con tarjetas, cronómetro y respuestas modelo.</li>
@@ -518,6 +559,114 @@ RENDER.inicio = () => {
     </div>
   </div>`;
 };
+
+/* ============================================================
+   VISTA: CURSO A0 → C1
+   ============================================================ */
+RENDER.curso = () => {
+  const levels = COURSE.levels;
+  const totalUnits = levels.reduce((a,l) => a + l.units.length, 0);
+  const doneTotal = levels.reduce((a,l) => a + l.units.filter(u => S.done[u.id]).length, 0);
+  const overall = Math.round(doneTotal / Math.max(1,totalUnits) * 100);
+
+  $('#curso').innerHTML = `
+  <div class="page-head">
+    <div class="kicker">Curso completo · 6 niveles</div>
+    <h1>De cero a héroe: A0 → C1</h1>
+    <p class="lead">${COURSE.intro}</p>
+  </div>
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <h3 style="margin:0">Tu avance</h3>
+        <p class="small muted mb0" id="courseCount">${doneTotal} de ${totalUnits} unidades completadas</p>
+      </div>
+      <span class="badge green" id="courseOverall">${overall}%</span>
+    </div>
+    <div class="bar" style="margin-top:12px" id="courseBar"><i style="width:${overall}%"></i></div>
+    <div class="grid three" style="margin-top:16px">
+      ${levels.map(l=>{
+        const d = l.units.filter(u=>S.done[u.id]).length;
+        return `<div class="stat" style="padding:12px 14px">
+          <div class="flex-between" style="margin-bottom:6px"><span class="badge">${l.cefr}</span><span class="small muted" data-lvl-n="${l.id}">${d}/4</span></div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:8px">${l.name}</div>
+          <div class="bar" data-lvl-bar="${l.id}"><i style="width:${Math.round(d/4*100)}%"></i></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="note" style="margin-bottom:0">
+      <b>Cómo avanzar:</b> una unidad al día. Lee la teoría, escucha los ejemplos (puedes bajar la velocidad), repite el test hasta acertar <b>4 de 5</b> y marca la unidad como completada. Si fallas 2 o más, vuelve mañana.
+    </div>
+  </div>
+
+  ${levels.map((l,li)=>{
+    const d = l.units.filter(u=>S.done[u.id]).length;
+    return `<div class="card">
+      <div class="flex-between">
+        <div>
+          <span class="badge green">${l.cefr}</span>
+          <h2 style="margin:10px 0 4px">${l.name}</h2>
+        </div>
+        <span class="badge" data-lvl-n="${l.id}">${d}/4 unidades</span>
+      </div>
+      <p class="small muted">${l.desc}</p>
+      <p class="small" style="margin-bottom:12px"><b>Objetivo del nivel:</b> ${l.goal}</p>
+      ${l.units.map((u,ui)=>`
+        <details class="card-det" ${li===0 && ui===0 ? 'open' : ''}>
+          <summary>${ui+1}. ${u.title}
+            <span class="det-meta">
+              <span class="badge green" data-unit-done="${u.id}" style="display:${S.done[u.id] ? 'inline-flex' : 'none'}">✓ hecha</span>
+              <span class="badge">${u.quiz.length} preguntas</span>
+            </span>
+          </summary>
+          <div class="details-body">
+            <p class="small muted"><b>Objetivo:</b> ${u.goal}</p>
+            ${u.points.map(p=>`<h3>${p.h}</h3>${p.html}`).join('')}
+            <div class="hr"></div>
+            <div class="flex-between">
+              <h3 style="margin:0">Vocabulario</h3>
+              <span class="small muted">${u.vocab.length} palabras con audio</span>
+            </div>
+            <div class="grid two" style="gap:0 22px;margin-top:6px">
+              ${u.vocab.map(v=>`<div class="kpi-line"><b>${v.en}</b><span class="small muted">${v.es}</span><span style="flex:1"></span>${wordBtn(v.en)}</div>`).join('')}
+            </div>
+            <div class="flex-between" style="margin-top:16px">
+              <h3 style="margin:0">Ejemplos</h3>
+              ${speakBtn('unit-'+u.id, u.examples.join(' '), 'Escuchar ejemplos')}
+            </div>
+            ${u.examples.map(e=>`<p class="ex">${e}</p>`).join('')}
+            <div class="hr"></div>
+            <h3>Test de la unidad</h3>
+            ${quizHTML(u.quiz, u.id, 'Curso ' + l.cefr + ' · ' + u.title)}
+            <div class="mt18">${doneBtn(u.id)}</div>
+          </div>
+        </details>`).join('')}
+    </div>`;
+  }).join('')}`;
+};
+
+/* actualiza los contadores del curso sin re-renderizar (no cierra desplegables) */
+function updateCourseProgress(){
+  if(!$('#curso')) return;
+  let doneTotal = 0;
+  COURSE.levels.forEach(l => {
+    const d = l.units.filter(u => S.done[u.id]).length;
+    doneTotal += d;
+    $$(`[data-lvl-n="${l.id}"]`).forEach(el => {
+      el.textContent = el.classList.contains('badge') ? d + '/4 unidades' : d + '/4';
+    });
+    $$(`[data-lvl-bar="${l.id}"]`).forEach(el => {
+      const i = el.querySelector('i');
+      if(i) i.style.width = (d / 4 * 100) + '%';
+    });
+  });
+  const total = COURSE.levels.reduce((a,l) => a + l.units.length, 0);
+  const pct = Math.round(doneTotal / total * 100);
+  const p = $('#courseOverall'); if(p) p.textContent = pct + '%';
+  const b = $('#courseBar'); if(b && b.querySelector('i')) b.querySelector('i').style.width = pct + '%';
+  const c = $('#courseCount'); if(c) c.textContent = `${doneTotal} de ${total} unidades completadas`;
+}
 
 /* ============================================================
    VISTA: RUTA
@@ -1285,7 +1434,7 @@ RENDER.progreso = () => {
 
   <div class="grid four">
     <div class="stat"><div class="n">${st}</div><div class="l">racha (días)</div></div>
-    <div class="stat"><div class="n">${doneCount}<small>/18</small></div><div class="l">lecciones</div></div>
+    <div class="stat"><div class="n">${doneCount}<small>/${LESSONS.length}</small></div><div class="l">lecciones</div></div>
     <div class="stat"><div class="n">${s.mastered}<small>/60</small></div><div class="l">palabras dominadas</div></div>
     <div class="stat"><div class="n">${bestExam!==null?bestExam+'%':'—'}</div><div class="l">mejor simulacro</div></div>
   </div>
@@ -1406,6 +1555,9 @@ document.addEventListener('click', e => {
     if(S.done[id]) delete S.done[id]; else { S.done[id] = true; touchStreak(); }
     d.classList.toggle('done', !!S.done[id]);
     d.textContent = S.done[id] ? '✓ Completado' : 'Marcar como completado';
+    const badge = document.querySelector(`[data-unit-done="${id}"]`);
+    if(badge) badge.style.display = S.done[id] ? 'inline-flex' : 'none';
+    updateCourseProgress();
     save();
     return;
   }
