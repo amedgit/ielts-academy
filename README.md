@@ -20,6 +20,7 @@ Y entra en <http://localhost:8080>.
 | Sección | Contenido |
 |---|---|
 | **Curso 0→C1** | 6 niveles (A0, A1, A2, B1, B2, C1) × 4 unidades: teoría, 144 palabras con audio, ejemplos locutados y 120 preguntas de test |
+| **فارسی (persa)** | La interfaz y el curso A0→C1 están disponibles en persa con diseño RTL; se detecta el idioma del navegador y hay selector ES/فا |
 | **Inicio** | Resumen, racha, estadísticas y expectativas realistas A2 → 7.0 |
 | **Ruta de estudio** | Plan de 48 semanas en 4 fases, semana tipo y tabla banda ↔ nivel MCER |
 | **Listening** | 3 tareas tipo examen (formulario, multiple choice, notas) con voz sintética y guion |

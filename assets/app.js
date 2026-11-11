@@ -52,6 +52,87 @@ function fmt(sec){
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 const countWords = t => (t.trim().match(/\S+/g)||[]).length;
 
+/* ------------------------- idioma ------------------------- */
+const FA_BROWSER = (() => {
+  try{
+    const l = String((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
+    return l.startsWith('fa');
+  }catch(e){ return false; }
+})();
+let LANG = S.lang || (FA_BROWSER ? 'fa' : 'es');
+const isFA = () => LANG === 'fa';
+const t = s => (LANG === 'fa' && UI_FA[s]) ? UI_FA[s] : s;
+
+function setLangChrome(){
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = isFA() ? 'rtl' : 'ltr';
+  document.title = isFA()
+    ? 'آکادمی آیلتس · از صفر تا C1'
+    : 'IELTS Academy · Curso de cero a C1 + IELTS 7.0';
+  $$('[data-lang-set]').forEach(b => {
+    const on = b.dataset.langSet === LANG;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
+function applyI18n(root){
+  if(!isFA() || !root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const nodes = [];
+  while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n => {
+    const raw = n.nodeValue || '';
+    const key = raw.trim();
+    if(!key) return;
+    const out = faText(key);
+    if(out && out !== key){
+      const lead = (raw.match(/^\s*/) || [''])[0];
+      const trail = (raw.match(/\s*$/) || [''])[0];
+      n.nodeValue = lead + out + trail;
+    }
+  });
+  root.querySelectorAll('[title],[placeholder],[aria-label]').forEach(el => {
+    ['title','placeholder','aria-label'].forEach(a => {
+      const v = el.getAttribute(a);
+      if(!v) return;
+      const out = faText(v.trim());
+      if(out) el.setAttribute(a, out);
+    });
+  });
+}
+
+function addFaNotice(name){
+  const v = $('#' + name);
+  if(!v || v.querySelector('.fa-notice')) return;
+  v.insertAdjacentHTML('afterbegin', `<div class="fa-notice">
+    <b>این بخش هنوز به فارسی ترجمه نشده است.</b>
+    <span>درس‌های انگلیسی در بخش «دورهٔ ۰ تا C1» به فارسی هستند.</span>
+    <button class="btn sm" data-nav="curso">رفتن به دورهٔ فارسی ←</button>
+  </div>`);
+}
+
+function applyLang(l){
+  LANG = (l === 'fa') ? 'fa' : 'es';
+  setLangChrome();
+  route();
+  applyI18n(document.body);
+}
+
+let i18nRAF = 0;
+function watchI18n(){
+  const mo = new MutationObserver(() => {
+    if(!isFA()) return;
+    cancelAnimationFrame(i18nRAF);
+    i18nRAF = requestAnimationFrame(() => {
+      applyI18n($('#main'));
+      applyI18n($('#sidebar'));
+      applyI18n($('.topbar'));
+    });
+  });
+  mo.observe(document.body, { childList:true, subtree:true, characterData:true });
+}
+
 /* cronómetros activos (se limpian al cambiar de vista) */
 const INTERVALS = new Set();
 function clearTimers(){ INTERVALS.forEach(id=>clearInterval(id)); INTERVALS.clear(); }
@@ -96,7 +177,7 @@ const slugify = s => String(s).toLowerCase().normalize('NFD')
 
 function doneBtn(id, label){
   const d = !!S.done[id];
-  return `<button class="btn ghost sm done-btn ${d?'done':''}" data-done="${id}">${d?'✓ Completado':(label||'Marcar como completado')}</button>`;
+  return `<button class="btn ghost sm done-btn ${d?'done':''}" data-done="${id}">${d?t('✓ Completado'):(label||t('Marcar como completado'))}</button>`;
 }
 
 /* ------------------------- tema ------------------------- */
@@ -468,9 +549,13 @@ function route(){
   window.speechSynthesis && window.speechSynthesis.cancel();
   $$('.view').forEach(v => v.classList.toggle('active', v.id === name));
   $$('.nav-item').forEach(a => a.classList.toggle('active', a.dataset.view === name));
-  $('#crumb').textContent = $('#'+name).dataset.title || 'Inicio';
+  $('#crumb').textContent = t($('#'+name).dataset.title || 'Inicio');
   if(RENDER[name]) RENDER[name]();
   stopPlayer();
+  if(isFA()){
+    applyI18n($('#main')); applyI18n($('#sidebar')); applyI18n($('.topbar'));
+    if(!['inicio','curso'].includes(name)) addFaNotice(name);
+  }
   $('#sidebar').classList.remove('open');
   $('#scrim').classList.remove('show');
   window.scrollTo({ top:0, behavior:'instant' in window ? 'instant' : 'auto' });
@@ -480,7 +565,106 @@ function route(){
 /* ============================================================
    VISTA: INICIO
    ============================================================ */
+
+function renderHomeFa(){
+  const doneCount = LESSONS.filter(([id]) => S.done[id]).length;
+  const mastered = VOCAB.filter(v => S.srs[v.w] && S.srs[v.w].box >= 4).length;
+  const bestExam = S.exams.length ? Math.max(...S.exams.map(e => e.pct)) : null;
+  const st = S.streak.last === dayKey() ? (S.streak.count||0) : 0;
+
+  $('#inicio').innerHTML = `
+  <div class="hero">
+    <span class="badge green">دورهٔ A0 → C1 + آمادگی آیلتس ۷.۰</span>
+    <h1>از صفر تا قهرمان در انگلیسی،<br>و بعد تا نمرهٔ ۷.۰ آیلتس.</h1>
+    <p>یک آکادمی کامل در مرورگر شما: دورهٔ ۲۴ درسی از الفبا تا سطح C1، به‌همراه آمادگی آیلتس: مسیر ۴۸ هفته، شنیداری با صدا، خواندن با توضیح، نوشتن با نمونه و گفتار با زمان‌سنج.</p>
+    <div class="hero-actions">
+      <button class="btn" data-nav="curso">شروع از صفر ←</button>
+      <button class="btn ghost" data-nav="plan">مسیر آیلتس (۴۸ هفته)</button>
+      <button class="btn ghost" data-nav="examen">آزمون کوتاه</button>
+    </div>
+  </div>
+
+  <div class="grid four" style="margin-bottom:18px">
+    <div class="stat"><div class="n">${st}</div><div class="l">روزهای پیوسته</div></div>
+    <div class="stat"><div class="n">${mastered}<small>/60</small></div><div class="l">واژهٔ مسلط</div></div>
+    <div class="stat"><div class="n">${doneCount}<small>/${LESSONS.length}</small></div><div class="l">درس‌های انجام‌شده</div></div>
+    <div class="stat"><div class="n">${bestExam!==null?bestExam+'%':'—'}</div><div class="l">بهترین آزمون</div></div>
+  </div>
+
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <span class="badge green">دورهٔ کامل</span>
+        <h2 style="margin:10px 0 4px">از صفر تا قهرمان · A0 → C1</h2>
+        <p class="small muted" style="margin:0">۲۴ درس · ۱۲۰ سؤال آزمون · ۱۴۴ واژه با صدا · نمونه‌های صوتی</p>
+      </div>
+      <button class="btn sm" data-nav="curso">ورود به دوره ←</button>
+    </div>
+    <div class="grid three" style="margin-top:16px">
+      ${COURSE.levels.map(l=>{
+        const d = l.units.filter(u=>S.done[u.id]).length;
+        const name = (COURSE_FA.levels[l.id] || {}).name || l.name;
+        return `<div class="stat" style="padding:11px 13px">
+          <div class="flex-between" style="margin-bottom:6px"><span class="badge">${l.cefr}</span><span class="small muted">${d}/4</span></div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:7px">${name}</div>
+          <div class="bar"><i style="width:${Math.round(d/4*100)}%"></i></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="note" style="margin-bottom:0">اگر از صفر شروع می‌کنید، روزی یک درس بخوانید و آزمون را تا ۴ از ۵ تکرار کنید. در ۶ هفته یک پایهٔ محکم A2 خواهید داشت.</div>
+  </div>
+
+  <div class="card">
+    <h2>قبل از شروع: حقیقت دربارهٔ صفر تا ۷.۰</h2>
+    <p class="muted">از صفر تا نمرهٔ ۷.۰ آیلتس حدود <b>۱۲۰۰ تا ۱۵۰۰ ساعت</b> مطالعهٔ واقعی لازم است. با هفته‌ای ۱۰ ساعت یعنی حدود دو سال؛ با هفته‌ای ۲۰ ساعت، حدود یک سال. جادو نیست، نظم است.</p>
+    <div class="note">نمرهٔ ۷.۰ یعنی سطح <b>C1</b>. با ترفند و جمله‌های حفظی به دست نمی‌آید؛ با ساعت‌های واقعی انگلیسی و تکنیک آزمون به دست می‌آید. این سایت ساختار را می‌دهد؛ ساعت‌ها را شما می‌گذارید.</div>
+    <div class="grid two">
+      <div>
+        <h3>چه چیزی پیدا می‌کنید</h3>
+        <ul class="clean">
+          <li><b>دورهٔ صفر تا C1</b> در ۶ سطح و ۲۴ درس با صدا.</li>
+          <li><b>مسیر آیلتس ۴۸ هفته</b> در چهار مرحله با هدف‌های روشن.</li>
+          <li><b>شنیداری واقعی</b> با صدای آمریکایی و متن.</li>
+          <li><b>خواندن</b> با سؤال‌های درست/نادرست/ذکر‌نشده و توضیح.</li>
+          <li><b>نوشتن</b> با ساختار و نمونهٔ نمرهٔ ۷.۵.</li>
+          <li><b>گفتار</b> با کارت، زمان‌سنج و پاسخ نمونه.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>چطور استفاده کنیم (۶۰ دقیقه)</h3>
+        <ul class="clean">
+          <li><b>۱۵ دقیقه</b> واژگان با کارت‌ها.</li>
+          <li><b>۲۰ دقیقه</b> یک مهارت: خواندن، شنیداری یا نوشتن.</li>
+          <li><b>۱۰ دقیقه</b> یک درس گرامر با آزمونش.</li>
+          <li><b>۱۵ دقیقه</b> انگلیسی واقعی: سریال، پادکست یا حرف زدن با خودتان.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid two">
+    <div class="card tight">
+      <span class="badge blue">مهارت‌ها</span>
+      <h3 style="margin-top:10px">از هر جا که سخت‌تر است شروع کنید</h3>
+      <p class="small muted">اگر از صفر شروع می‌کنید، روزانه <b>شنیداری + واژگان</b> و سه بار در هفته گرامر.</p>
+      <div class="chips">
+        <button class="chip" data-nav="listening">🎧 شنیداری</button>
+        <button class="chip" data-nav="reading">📖 خواندن</button>
+        <button class="chip" data-nav="writing">✍ نوشتن</button>
+        <button class="chip" data-nav="speaking">🗣 گفتار</button>
+      </div>
+    </div>
+    <div class="card tight">
+      <span class="badge warn">قاعدهٔ طلایی</span>
+      <h3 style="margin-top:10px">روزی ۳۰ دقیقه بهتر از ۶ ساعت یک‌بار در هفته است</h3>
+      <p class="small muted">زبان در خواب تثبیت می‌شود. زنجیرهٔ روزهای پیوسته کارهایی را می‌شمارد که انجام داده‌اید: یک آزمون، یک جلسهٔ واژگان یا یک درس علامت‌خورده.</p>
+      <button class="btn ghost sm" data-nav="progreso">دیدن پیشرفت</button>
+    </div>
+  </div>`;
+}
+
 RENDER.inicio = () => {
+  if(isFA()){ renderHomeFa(); return; }
   const doneCount = LESSONS.filter(([id]) => S.done[id]).length;
   const mastered = VOCAB.filter(v => S.srs[v.w] && S.srs[v.w].box >= 4).length;
   const bestExam = S.exams.length ? Math.max(...S.exams.map(e => e.pct)) : null;
@@ -580,23 +764,28 @@ RENDER.inicio = () => {
    VISTA: CURSO A0 → C1
    ============================================================ */
 RENDER.curso = () => {
+  const F = isFA();
   const levels = COURSE.levels;
   const totalUnits = levels.reduce((a,l) => a + l.units.length, 0);
   const doneTotal = levels.reduce((a,l) => a + l.units.filter(u => S.done[u.id]).length, 0);
   const overall = Math.round(doneTotal / Math.max(1,totalUnits) * 100);
+  const LV = id => (F ? (COURSE_FA.levels[id] || {}) : {});
+  const UN = id => (F ? (COURSE_FA.units[id] || {}) : {});
 
   $('#curso').innerHTML = `
   <div class="page-head">
-    <div class="kicker">Curso completo · 6 niveles</div>
-    <h1>De cero a héroe: A0 → C1</h1>
-    <p class="lead">${COURSE.intro}</p>
+    <div class="kicker">${F ? 'دورهٔ کامل · ۶ سطح' : 'Curso completo · 6 niveles'}</div>
+    <h1>${F ? 'از صفر تا قهرمان: A0 → C1' : 'De cero a héroe: A0 → C1'}</h1>
+    <p class="lead">${F ? COURSE_FA.intro : COURSE.intro}</p>
   </div>
 
   <div class="card">
     <div class="flex-between">
       <div>
-        <h3 style="margin:0">Tu avance</h3>
-        <p class="small muted mb0" id="courseCount">${doneTotal} de ${totalUnits} unidades completadas</p>
+        <h3 style="margin:0">${t('Tu avance')}</h3>
+        <p class="small muted mb0" id="courseCount">${F
+          ? `${doneTotal} از ${totalUnits} درس کامل شده`
+          : `${doneTotal} de ${totalUnits} unidades completadas`}</p>
       </div>
       <span class="badge green" id="courseOverall">${overall}%</span>
     </div>
@@ -604,60 +793,71 @@ RENDER.curso = () => {
     <div class="grid three" style="margin-top:16px">
       ${levels.map(l=>{
         const d = l.units.filter(u=>S.done[u.id]).length;
+        const name = LV(l.id).name || l.name;
         return `<div class="stat" style="padding:12px 14px">
           <div class="flex-between" style="margin-bottom:6px"><span class="badge">${l.cefr}</span><span class="small muted" data-lvl-n="${l.id}">${d}/4</span></div>
-          <div style="font-weight:700;font-size:.9rem;margin-bottom:8px">${l.name}</div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:8px">${name}</div>
           <div class="bar" data-lvl-bar="${l.id}"><i style="width:${Math.round(d/4*100)}%"></i></div>
         </div>`;
       }).join('')}
     </div>
     <div class="note" style="margin-bottom:0">
-      <b>Cómo avanzar:</b> una unidad al día. Lee la teoría, escucha los ejemplos (puedes bajar la velocidad), repite el test hasta acertar <b>4 de 5</b> y marca la unidad como completada. Si fallas 2 o más, vuelve mañana.
+      ${F
+        ? '<b>چطور پیش برویم:</b> روزی یک درس. نظریه را بخوانید، نمونه‌ها را گوش کنید (سرعت را می‌توانید کم کنید)، آزمون را تا ۴ از ۵ تکرار کنید و درس را انجام‌شده علامت بزنید. اگر ۲ یا بیشتر غلط زدید، فردا برگردید.'
+        : '<b>Cómo avanzar:</b> una unidad al día. Lee la teoría, escucha los ejemplos (puedes bajar la velocidad), repite el test hasta acertar <b>4 de 5</b> y marca la unidad como completada. Si fallas 2 o más, vuelve mañana.'}
     </div>
   </div>
 
   ${levels.map((l,li)=>{
+    const lf = LV(l.id);
     const d = l.units.filter(u=>S.done[u.id]).length;
     return `<div class="card">
       <div class="flex-between">
         <div>
           <span class="badge green">${l.cefr}</span>
-          <h2 style="margin:10px 0 4px">${l.name}</h2>
+          <h2 style="margin:10px 0 4px">${lf.name || l.name}</h2>
         </div>
-        <span class="badge" data-lvl-n="${l.id}">${d}/4 unidades</span>
+        <span class="badge" data-lvl-n="${l.id}">${d}/4 ${t('unidades')}</span>
       </div>
-      <p class="small muted">${l.desc}</p>
-      <p class="small" style="margin-bottom:12px"><b>Objetivo del nivel:</b> ${l.goal}</p>
-      ${l.units.map((u,ui)=>`
-        <details class="card-det" ${li===0 && ui===0 ? 'open' : ''}>
-          <summary>${ui+1}. ${u.title}
+      <p class="small muted">${lf.desc || l.desc}</p>
+      <p class="small" style="margin-bottom:12px"><b>${t('Objetivo del nivel:')}</b> ${lf.goal || l.goal}</p>
+      ${l.units.map((u,ui)=>{
+        const uf = UN(u.id);
+        const title = uf.title || u.title;
+        const goal = uf.goal || u.goal;
+        const points = uf.points || u.points;
+        const vfa = uf.vocab || {};
+        const label = F ? 'درس' : 'unidad';
+        return `<details class="card-det" ${li===0 && ui===0 ? 'open' : ''}>
+          <summary>${ui+1}. ${title}
             <span class="det-meta">
-              <span class="badge green" data-unit-done="${u.id}" style="display:${S.done[u.id] ? 'inline-flex' : 'none'}">✓ hecha</span>
-              <span class="badge">${u.quiz.length} preguntas</span>
+              <span class="badge green" data-unit-done="${u.id}" style="display:${S.done[u.id] ? 'inline-flex' : 'none'}">${F ? '✓ انجام شد' : '✓ hecha'}</span>
+              <span class="badge">${u.quiz.length} ${t('preguntas')}</span>
             </span>
           </summary>
           <div class="details-body">
-            <p class="small muted"><b>Objetivo:</b> ${u.goal}</p>
-            ${u.points.map(p=>`<h3>${p.h}</h3>${p.html}`).join('')}
+            <p class="small muted"><b>${t('Objetivo:')}</b> ${goal}</p>
+            ${points.map(p=>`<h3>${p.h}</h3>${p.html}`).join('')}
             <div class="hr"></div>
             <div class="flex-between">
-              <h3 style="margin:0">Vocabulario</h3>
-              <span class="small muted">${u.vocab.length} palabras con audio</span>
+              <h3 style="margin:0">${t('Vocabulario')}</h3>
+              <span class="small muted">${u.vocab.length} ${F ? 'واژه با صدا' : 'palabras con audio'}</span>
             </div>
             <div class="grid two" style="gap:0 22px;margin-top:6px">
-              ${u.vocab.map(v=>`<div class="kpi-line"><b>${v.en}</b><span class="small muted">${v.es}</span><span style="flex:1"></span>${wordBtn(v.en)}</div>`).join('')}
+              ${u.vocab.map(v=>`<div class="kpi-line"><b>${v.en}</b><span class="small muted">${F ? (vfa[v.en] || v.es) : v.es}</span><span style="flex:1"></span>${wordBtn(v.en)}</div>`).join('')}
             </div>
             <div class="flex-between" style="margin-top:16px">
-              <h3 style="margin:0">Ejemplos</h3>
-              ${speakBtn('unit-'+u.id, u.examples.join(' '), 'Escuchar ejemplos')}
+              <h3 style="margin:0">${t('Ejemplos')}</h3>
+              ${speakBtn('unit-'+u.id, u.examples.join(' '), t('Escuchar ejemplos'))}
             </div>
             ${u.examples.map(e=>`<p class="ex">${e}</p>`).join('')}
             <div class="hr"></div>
-            <h3>Test de la unidad</h3>
-            ${quizHTML(u.quiz, u.id, 'Curso ' + l.cefr + ' · ' + u.title)}
+            <h3>${t('Test de la unidad')}</h3>
+            ${quizHTML(u.quiz, u.id, (F ? 'دوره · ' : 'Curso ') + (lf.name || l.name) + ' · ' + title)}
             <div class="mt18">${doneBtn(u.id)}</div>
           </div>
-        </details>`).join('')}
+        </details>`;
+      }).join('')}
     </div>`;
   }).join('')}`;
 };
@@ -670,18 +870,21 @@ function updateCourseProgress(){
     const d = l.units.filter(u => S.done[u.id]).length;
     doneTotal += d;
     $$(`[data-lvl-n="${l.id}"]`).forEach(el => {
-      el.textContent = el.classList.contains('badge') ? d + '/4 unidades' : d + '/4';
+      el.textContent = el.classList.contains('badge') ? `${d}/4 ${t('unidades')}` : d + '/4';
     });
     $$(`[data-lvl-bar="${l.id}"]`).forEach(el => {
       const i = el.querySelector('i');
       if(i) i.style.width = (d / 4 * 100) + '%';
     });
   });
+  const F = isFA();
   const total = COURSE.levels.reduce((a,l) => a + l.units.length, 0);
   const pct = Math.round(doneTotal / total * 100);
   const p = $('#courseOverall'); if(p) p.textContent = pct + '%';
   const b = $('#courseBar'); if(b && b.querySelector('i')) b.querySelector('i').style.width = pct + '%';
-  const c = $('#courseCount'); if(c) c.textContent = `${doneTotal} de ${total} unidades completadas`;
+  const c = $('#courseCount'); if(c) c.textContent = F
+    ? `${doneTotal} از ${total} درس کامل شده`
+    : `${doneTotal} de ${total} unidades completadas`;
 }
 
 /* ============================================================
@@ -1141,7 +1344,7 @@ function renderDeck(){
           <div class="fc-hint">Toca la tarjeta para ver el significado</div>
         </div>
         <div class="fc-face back">
-          <div class="fc-trans">${v.es}</div>
+          <div class="fc-trans">${isFA() ? (VOCAB_FA[v.w] || v.es) : v.es}</div>
           <div class="fc-label">Definición</div>
           <div class="fc-def">${v.en}</div>
           <div class="fc-label">Ejemplo</div>
@@ -1229,12 +1432,12 @@ RENDER.vocab = () => {
 
   <div class="card">
     <div class="flex-between">
-      <h3 style="margin:0">Lista completa</h3>
+      <h3 style="margin:0">${t('Lista completa')}</h3>
       <input type="text" id="vocabSearch" class="searchbar" placeholder="Buscar palabra o traducción…" autocomplete="off">
     </div>
     <div class="table-wrap" style="margin-top:14px">
       <table class="word-table">
-        <thead><tr><th>Palabra</th><th>Nivel</th><th>Español</th><th>Ejemplo</th></tr></thead>
+        <thead><tr><th>${t('Palabra')}</th><th>${t('Nivel')}</th><th>${t('Español')}</th><th>${t('Ejemplo')}</th></tr></thead>
         <tbody id="vocabRows">
           ${VOCAB.map(v=>{
             const box = S.srs[v.w] ? S.srs[v.w].box||0 : -1;
@@ -1242,7 +1445,7 @@ RENDER.vocab = () => {
             return `<tr data-search="${(v.w+' '+v.es+' '+v.en).toLowerCase()}">
               <td>${v.w}<div class="small muted" style="font-weight:400">${v.ipa}</div></td>
               <td>${badge}</td>
-              <td>${v.es}</td>
+              <td>${isFA() ? (VOCAB_FA[v.w] || v.es) : v.es}</td>
               <td class="small">${v.ex}</td>
             </tr>`;
           }).join('')}
@@ -1494,10 +1697,18 @@ RENDER.progreso = () => {
   <div class="card">
     <h3>Lecciones</h3>
     <div class="grid two" style="gap:0 24px">
-      ${LESSONS.map(([id,title])=>`<label class="kpi-line" style="cursor:pointer">
+      ${LESSONS.map(([id,title])=>{
+        let lab = title;
+        if(isFA()){
+          const cu = COURSE_FA.units[id];
+          const lvl = COURSE.levels.find(x => x.units.some(y => y.id === id));
+          if(cu && lvl) lab = `دورهٔ ${COURSE_FA.levels[lvl.id].name} · ${cu.title}`;
+        }
+        return `<label class="kpi-line" style="cursor:pointer">
         <input type="checkbox" data-lesson="${id}" ${S.done[id]?'checked':''} style="width:auto;margin-right:6px">
-        <span class="grow" style="color:${S.done[id]?'var(--muted)':'#c3d3e3'}">${title}</span>
-      </label>`).join('')}
+        <span class="grow" style="color:${S.done[id]?'var(--muted)':'#c3d3e3'}">${lab}</span>
+      </label>`;
+      }).join('')}
     </div>
   </div>
 
@@ -1570,7 +1781,7 @@ document.addEventListener('click', e => {
     const id = d.dataset.done;
     if(S.done[id]) delete S.done[id]; else { S.done[id] = true; touchStreak(); }
     d.classList.toggle('done', !!S.done[id]);
-    d.textContent = S.done[id] ? '✓ Completado' : 'Marcar como completado';
+    d.textContent = S.done[id] ? t('✓ Completado') : t('Marcar como completado');
     const badge = document.querySelector(`[data-unit-done="${id}"]`);
     if(badge) badge.style.display = S.done[id] ? 'inline-flex' : 'none';
     updateCourseProgress();
@@ -1651,6 +1862,16 @@ $('#scrim').addEventListener('click', ()=>{
   $('#scrim').classList.remove('show');
 });
 
+/* cambiar de idioma (recarga para reconstruir todo el shell) */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-lang-set]');
+  if(!b) return;
+  if(b.dataset.langSet === LANG) return;
+  S.lang = b.dataset.langSet;
+  save();
+  location.reload();
+});
+
 /* cambiar de tema */
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-theme-set]');
@@ -1682,6 +1903,8 @@ document.addEventListener('input', e => {
 
 /* arranque */
 applyTheme(S.theme);
+setLangChrome();
+watchI18n();
 window.addEventListener('hashchange', route);
 if(!location.hash) location.hash = 'inicio';
 route();
