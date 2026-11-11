@@ -7,7 +7,7 @@
 const KEY = 'ielts-academy-v1';
 const DEFAULT_STATE = {
   done: {}, srs: {}, quiz: {}, exams: [], draft: '',
-  streak: { last: null, count: 0 }
+  streak: { last: null, count: 0 }, theme: 'light'
 };
 let S = loadState();
 
@@ -97,6 +97,16 @@ const slugify = s => String(s).toLowerCase().normalize('NFD')
 function doneBtn(id, label){
   const d = !!S.done[id];
   return `<button class="btn ghost sm done-btn ${d?'done':''}" data-done="${id}">${d?'✓ Completado':(label||'Marcar como completado')}</button>`;
+}
+
+/* ------------------------- tema ------------------------- */
+function applyTheme(t){
+  const dark = t === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const icon = $('#themeIcon'); if(icon) icon.textContent = dark ? '☀️' : '🌙';
+  const label = $('.theme-label'); if(label) label.textContent = dark ? 'Claro' : 'Oscuro';
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', dark ? '#080c12' : '#f4f7fa');
 }
 
 /* ------------------------- barra superior ------------------------- */
@@ -1635,6 +1645,14 @@ $('#scrim').addEventListener('click', ()=>{
   $('#scrim').classList.remove('show');
 });
 
+/* cambiar de tema */
+$('#themeBtn').addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  S.theme = next;
+  save();
+  applyTheme(next);
+});
+
 /* repaso rápido desde la barra superior */
 $('#quickStudy').addEventListener('click', ()=>{
   pendingSession = true;
@@ -1656,6 +1674,7 @@ document.addEventListener('input', e => {
 });
 
 /* arranque */
+applyTheme(S.theme === 'dark' ? 'dark' : 'light');
 window.addEventListener('hashchange', route);
 if(!location.hash) location.hash = 'inicio';
 route();
